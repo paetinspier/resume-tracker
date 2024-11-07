@@ -6,7 +6,7 @@ import { JobApplication } from "@/lib/firebase/models";
 import React, { useEffect, useState } from "react";
 
 export default function CalendarPage() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [year, setYear] = useState<number>(new Date().getFullYear());
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -38,5 +38,5 @@ export default function CalendarPage() {
     }
   }, [user, applications]); // Add 'applications' as a secondary dependency to avoid redundant fetches
 
-  return <YearCalendar></YearCalendar>;
+  return <YearCalendar year={year} setYear={setYear}></YearCalendar>;
 }

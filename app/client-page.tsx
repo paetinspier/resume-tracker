@@ -27,6 +27,7 @@ import { JobApplication, JobApplicationStatus } from "@/lib/firebase/models";
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
 import {
   Building,
+  Calendar,
   ClipboardList,
   FileBadge,
   FileUser,
@@ -251,6 +252,14 @@ export default function ClientHomePage({
                           <Building size={16} />
                         </CardDescription>
                         <CardDescription>{app.companyName}</CardDescription>
+                      </div>
+                      <div className="w-full flex flex-row justify-start items-center gap-2">
+                        <CardDescription>
+                          <Calendar size={16} />
+                        </CardDescription>
+                        <CardDescription>
+                          {app.appliedDate.toDateString()}
+                        </CardDescription>
                       </div>
                       <div className="w-full flex flex-row justify-start items-center gap-2 overflow-hidden">
                         <CardDescription>

@@ -157,12 +157,9 @@ export default function AddApplicationDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="hidden md:flex flex-row justify-center items-center gap-2">
+        <Button className="flex flex-row justify-center items-center gap-2">
           <Plus />
-          Add Application
-        </Button>
-        <Button className="md:hidden flex flex-row justify-center items-center gap-2">
-          <Plus />
+          <div className="hidden md:block">Add Application</div>
         </Button>
       </DialogTrigger>
       <DialogContent>

@@ -1,7 +1,7 @@
+"use client";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -11,24 +11,25 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Calendar,
-  Home,
-  Inbox,
-  Search,
-  Settings,
-  LayoutGrid,
   LayoutList,
   FileUser,
   FileText,
-  Building,
   UserPen,
+  ChartPie,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./mode-toggle";
+import { useAuth } from "@/lib/AuthContext";
 
 const items = [
   {
+    title: "Dashboard",
+    url: "/portal/dashboard",
+    icon: ChartPie,
+  },
+  {
     title: "Applications",
-    url: "/portal",
+    url: "/portal/applications",
     icon: LayoutList,
   },
   {
@@ -41,11 +42,11 @@ const items = [
     url: "/portal/coverletters",
     icon: FileText,
   },
-  {
-    title: "Jobs",
-    url: "/portal/jobs",
-    icon: Building,
-  },
+  // {
+  //   title: "Jobs",
+  //   url: "/portal/jobs",
+  //   icon: Building,
+  // },
   {
     title: "Calendar",
     url: "/portal/calendar",
@@ -62,17 +63,21 @@ const accountItems = [
 ];
 
 export function AppSidebar() {
+  const { user } = useAuth();
   return (
     <Sidebar>
       <SidebarContent>
-        <div className="p-4 flex flex-row justify-start items-center gap-4">
+        <div className="p-4 flex flex-row justify-between items-center gap-4 overflow-hidden">
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage
+              src={user?.photoURL || "https://github.com/shadcn.png"}
+            />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <div>Paetin Nelson</div>
           <ModeToggle />
         </div>
+
+        <div className="px-4">{user?.displayName || user?.email}</div>
         <SidebarGroup>
           <SidebarGroupLabel>Job Applications</SidebarGroupLabel>
           <SidebarGroupContent>

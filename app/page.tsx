@@ -9,7 +9,7 @@ export default function Home() {
   const router = useRouter();
 
   if (user) {
-    router.push("/portal");
+    router.push("/portal/applications");
   }
 
   return <Authentication></Authentication>;

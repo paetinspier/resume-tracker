@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import ClientHomePage from "../client-page";
 import { JobApplication } from "@/lib/firebase/models";
 import { getJobApplications } from "@/lib/firebase/firestore";
 import { useAuth } from "@/lib/AuthContext";
-import Loading from "../loading";
+import Loading from "@/app/loading";
+import ClientHomePage from "@/app/client-page";
 
 export default function Home() {
   const [applications, setApplications] = useState<JobApplication[]>([]);

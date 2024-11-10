@@ -37,7 +37,7 @@ export default function Authentication() {
         result = await signupWithEmailAndPassword(email, password);
       }
       if (result?.uid) {
-        router.push("/portal");
+        router.push("/portal/applications");
       }
     } catch (err) {
       console.log(err);

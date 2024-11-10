@@ -59,7 +59,6 @@ export default function AddApplicationDialog({
     handleSubmit,
     register,
     watch,
-    setValue,
     setError,
     reset,
     control,
@@ -105,7 +104,7 @@ export default function AddApplicationDialog({
         //description: "Friday, February 10, 2023 at 5:57 PM",
         //action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
       });
-      reset;
+      reset();
       setOpen(false);
     } catch (err) {
       console.log("error with application/create method in dialog component");
@@ -115,11 +114,11 @@ export default function AddApplicationDialog({
     }
   };
 
-  const handleDateBySelect = (value: any) => {
+  const handleDateBySelect = (value: string) => {
     setDate(addDays(new Date(), parseInt(value)));
   };
 
-  const handleDateByCalendar = (value: any) => {
+  const handleDateByCalendar = (value: Date | undefined) => {
     setDate(value);
   };
 
@@ -252,7 +251,7 @@ export default function AddApplicationDialog({
                       <Calendar
                         mode="single"
                         selected={date}
-                        onSelect={handleDateByCalendar}
+                        onSelect={(e) => handleDateByCalendar(e)}
                       />
                     </div>
                   </PopoverContent>

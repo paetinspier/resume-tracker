@@ -8,7 +8,6 @@ import React, { useEffect, useState } from "react";
 export default function CalendarPage() {
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [applications, setApplications] = useState<JobApplication[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -27,8 +26,6 @@ export default function CalendarPage() {
         }
       } catch (error) {
         console.error("Error fetching job applications:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -38,5 +35,11 @@ export default function CalendarPage() {
     }
   }, [user, applications]); // Add 'applications' as a secondary dependency to avoid redundant fetches
 
-  return <YearCalendar year={year} setYear={setYear}></YearCalendar>;
+  return (
+    <YearCalendar
+      year={year}
+      setYear={setYear}
+      jobApplications={applications}
+    ></YearCalendar>
+  );
 }

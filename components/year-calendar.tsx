@@ -1,19 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "./ui/button";
-import { getDaysOfTheYear, Year } from "@/lib/utils";
+import { Button, buttonVariants } from "./ui/button";
+import { cn, getDaysOfTheYear, Year } from "@/lib/utils";
+import { JobApplication } from "@/lib/firebase/models";
 
-function classNames(...classes: any[]) {
+function classNames(...classes: (string | boolean)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 interface YearCalendarProps {
   year: number;
   setYear: (year: number) => void;
+  jobApplications: JobApplication[];
 }
 
-export default function YearCalendar({ year, setYear }: YearCalendarProps) {
+export default function YearCalendar({
+  year,
+  setYear,
+  jobApplications,
+}: YearCalendarProps) {
   const [currentYear, setCurrentYear] = useState<Year>();
+
   useEffect(() => {
     if (year && currentYear?.value !== year) {
       setCurrentYear(getDaysOfTheYear(year));
@@ -29,22 +36,24 @@ export default function YearCalendar({ year, setYear }: YearCalendarProps) {
           </time>
         </h1>
         <div className="flex items-center">
-          <div className="relative flex items-center rounded-md bg-primary dark:bg-background md:items-stretch">
+          <div className="relative flex items-center rounded-md bg-primary dark:bg-background md:items-stretch gap-4">
             <Button
               onClick={() => setYear(year - 1)}
               type="button"
-              className="flex items-center justify-center"
+              className="flex items-center justify-center gap-1"
             >
               <span className="sr-only">Previous year</span>
               <ChevronLeft />
+              {year - 1}
             </Button>
             <span className="relative -mx-px h-5 w-px bg-gray-300 md:hidden" />
             <Button
               onClick={() => setYear(year + 1)}
               type="button"
-              className="flex items-center justify-center"
+              className="flex items-center justify-center gap-1"
             >
               <span className="sr-only">Next year</span>
+              {year + 1}
               <ChevronRight />
             </Button>
           </div>
@@ -85,23 +94,35 @@ export default function YearCalendar({ year, setYear }: YearCalendarProps) {
                         </div>
                       );
                     } else {
+                      const amount = jobApplications.filter(
+                        (ja) =>
+                          ja.appliedDate.toDateString() === day.toDateString(),
+                      ).length;
                       return (
                         <div
+                          onClick={() => console.log(day)}
                           key={day.getDate()}
                           className={classNames(
                             dayIdx === 0 && "rounded-tl-lg",
                             dayIdx === 6 && "rounded-tr-lg",
                             dayIdx === month.days.length - 7 && "rounded-bl-lg",
                             dayIdx === month.days.length - 1 && "rounded-br-lg",
-                            "py-1.5 focus:z-10",
+                            "py-1.5 focus:z-10 cursor-pointer",
                           )}
                         >
                           <time
                             dateTime={day.getDate().toString()}
                             className={classNames(
-                              day === new Date() &&
-                                "bg-primary dark:bg-background text-primary dark:text-primary",
-                              "mx-auto flex h-7 w-7 items-center justify-center rounded-full",
+                              day.toDateString() ===
+                                new Date().toDateString() &&
+                                "bg-accent text-accent-foreground border-white",
+                              amount > 0 && amount <= 1 && "bg-blue-200",
+                              amount > 1 && amount <= 3 && "bg-blue-400",
+                              amount > 3 && "bg-blue-600",
+                              cn(
+                                buttonVariants({ variant: "ghost" }),
+                                "h-10 w-10 p-0 font-normal bg-opacity-70 aria-selected:opacity-100 border border-transparent",
+                              ),
                             )}
                           >
                             {day.getUTCDate()}

@@ -162,13 +162,13 @@ export default function AddApplicationDialog({
           <div className="hidden md:block">Add Application</div>
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="h-full max-h-screen overflow-y-scroll">
         <DialogHeader>
           <DialogTitle>Create Application</DialogTitle>
           <DialogDescription>
             Add create application description later
           </DialogDescription>
-          <div className="w-full pt-6">
+          <div className="w-full pb-20 pt-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="companyName">Company Name</Label>

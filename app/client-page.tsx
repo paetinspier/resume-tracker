@@ -104,9 +104,9 @@ export default function ClientHomePage({
     return <div>Login page</div>;
   } else {
     return (
-      <div className="px-8 pb-20 h-full w-full flex flex-col justify-start items-start gap-8 relative">
-        <div className="w-full flex flex-row justify-between items-center px-8">
-          <h1 className="text-3xl">Applications</h1>
+      <div className="md:px-8 px-4 pb-20 h-full w-full flex flex-col justify-start items-start gap-8 relative">
+        <div className="w-full flex flex-row justify-between items-center px-2 md:px-8">
+          <h1 className="md:text-3xl text-xl">Applications</h1>
           <AddApplicationDialog setApplications={setApplications} />
         </div>
         <Separator />

@@ -51,8 +51,8 @@ export default function CoverLetterPage() {
 
   if (loading) return <LoadingCoverLetters></LoadingCoverLetters>;
   return (
-    <div className="px-8 pb-20 h-full w-full flex flex-col justify-start items-start gap-8 relative">
-      <div className="w-full flex flex-row justify-start items-center px-8">
+    <div className="md:px-8 px-4 pb-20 h-full w-full flex flex-col justify-start items-start gap-8 relative">
+      <div className="w-full flex flex-row justify-start items-center md:px-8 px-2">
         <h1 className="text-3xl">CoverLetters</h1>
       </div>
       <Separator />

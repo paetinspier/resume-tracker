@@ -8,9 +8,11 @@ export interface JobApplication {
   resumeURL: string;
   coverLetterURL: string;
   appliedDate: Date;
-  interviewStartDate?: Date;
+  interviewDates?: Date[];
   rejectionDate?: Date;
+  applicationSurceUrl?: string;
   status: string;
+  notes: string;
 }
 
 export interface FirestoreJobApplicationResponse {

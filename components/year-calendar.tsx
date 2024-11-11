@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
 import { cn, getDaysOfTheYear, Year } from "@/lib/utils";
 import { JobApplication } from "@/lib/firebase/models";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
+import { useRouter } from "next/navigation";
 
 function classNames(...classes: (string | boolean)[]) {
   return classes.filter(Boolean).join(" ");
@@ -20,6 +22,7 @@ export default function YearCalendar({
   jobApplications,
 }: YearCalendarProps) {
   const [currentYear, setCurrentYear] = useState<Year>();
+  const router = useRouter();
 
   useEffect(() => {
     if (year && currentYear?.value !== year) {
@@ -73,7 +76,7 @@ export default function YearCalendar({
                 <div>S</div>
                 <div>S</div>
               </div>
-              <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg bg-primary dark:bg-background text-sm">
+              <div className="mt-2 grid grid-cols-7 gap-px rounded-lg bg-primary dark:bg-background text-sm">
                 {new Array(month.startDay)
                   .fill(new Date())
                   .concat(month.days)
@@ -94,40 +97,74 @@ export default function YearCalendar({
                         </div>
                       );
                     } else {
-                      const amount = jobApplications.filter(
+                      const jobApps = jobApplications.filter(
                         (ja) =>
                           ja.appliedDate.toDateString() === day.toDateString(),
-                      ).length;
+                      );
                       return (
-                        <div
-                          onClick={() => console.log(day)}
-                          key={day.getDate()}
-                          className={classNames(
-                            dayIdx === 0 && "rounded-tl-lg",
-                            dayIdx === 6 && "rounded-tr-lg",
-                            dayIdx === month.days.length - 7 && "rounded-bl-lg",
-                            dayIdx === month.days.length - 1 && "rounded-br-lg",
-                            "py-1.5 focus:z-10 cursor-pointer",
-                          )}
-                        >
-                          <time
-                            dateTime={day.getDate().toString()}
-                            className={classNames(
-                              day.toDateString() ===
-                                new Date().toDateString() &&
-                                "bg-accent text-accent-foreground border-white",
-                              amount > 0 && amount <= 1 && "bg-blue-200",
-                              amount > 1 && amount <= 3 && "bg-blue-400",
-                              amount > 3 && "bg-blue-600",
-                              cn(
-                                buttonVariants({ variant: "ghost" }),
-                                "h-10 w-10 p-0 font-normal bg-opacity-70 aria-selected:opacity-100 border border-transparent",
-                              ),
-                            )}
-                          >
-                            {day.getUTCDate()}
-                          </time>
-                        </div>
+                        <HoverCard>
+                          <HoverCardTrigger asChild>
+                            <div
+                              onClick={() => console.log(day)}
+                              key={day.getDate()}
+                              className={classNames(
+                                dayIdx === 0 && "rounded-tl-lg",
+                                dayIdx === 6 && "rounded-tr-lg",
+                                dayIdx === month.days.length - 7 &&
+                                  "rounded-bl-lg",
+                                dayIdx === month.days.length - 1 &&
+                                  "rounded-br-lg",
+                                "py-1.5 focus:z-10 cursor-pointer",
+                              )}
+                            >
+                              <time
+                                dateTime={day.getDate().toString()}
+                                className={classNames(
+                                  day.toDateString() ===
+                                    new Date().toDateString() &&
+                                    "bg-accent text-accent-foreground border-white",
+                                  jobApps.length > 0 &&
+                                    jobApps.length <= 1 &&
+                                    "bg-blue-200",
+                                  jobApps.length > 1 &&
+                                    jobApps.length <= 3 &&
+                                    "bg-blue-400",
+                                  jobApps.length > 3 && "bg-blue-600",
+                                  cn(
+                                    buttonVariants({ variant: "ghost" }),
+                                    "h-10 w-10 p-0 font-normal bg-opacity-70 aria-selected:opacity-100 border border-transparent",
+                                  ),
+                                )}
+                              >
+                                {day.getUTCDate()}
+                              </time>
+                            </div>
+                          </HoverCardTrigger>
+                          <HoverCardContent className="z-50">
+                            <div className="w-full flex flex-col justify-center items-start gap-2">
+                              <div className="text-primary pb-2">
+                                Job Applications
+                              </div>
+                              {jobApps.map((a) => {
+                                return (
+                                  <Button
+                                    onClick={() =>
+                                      router.push(
+                                        `/portal/applications/${a.id}`,
+                                      )
+                                    }
+                                    className="w-full"
+                                  >
+                                    {a.companyName}
+                                  </Button>
+                                );
+                              })}
+                              {jobApps.length > 1 && (
+                                <Button className="w-full">See All</Button>
+                              )}
+                            </div>
+                          </HoverCardContent>
+                        </HoverCard>
                       );
                     }
                   })}

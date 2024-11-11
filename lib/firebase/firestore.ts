@@ -6,6 +6,8 @@ import {
   getDocs,
   updateDoc,
   deleteDoc,
+  where,
+  getDoc,
 } from "firebase/firestore";
 import { firestore } from "./firebase";
 import {
@@ -41,6 +43,43 @@ export const getJobApplications = async (userId: string) => {
     }) as JobApplication[];
   } catch (err) {
     console.log(err);
+  }
+};
+
+export const getJobApplicationById = async (
+  userId: string,
+  applicationId: string,
+) => {
+  try {
+    if (!userId || !applicationId) return;
+
+    // Directly reference the specific document using `doc` and `getDoc`
+    const docRef = doc(
+      firestore,
+      "users",
+      userId,
+      "applications",
+      applicationId,
+    );
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      console.log("No document found.");
+      return null;
+    }
+
+    // Retrieve the document data and convert it
+    const data = {
+      id: docSnap.id,
+      ...docSnap.data(),
+    } as FirestoreJobApplicationResponse;
+
+    const res = convertFirestoreJobApplicationResponse(data) as JobApplication;
+    console.log(res);
+    return res;
+  } catch (err) {
+    console.log("Error retrieving job application:", err);
+    return null;
   }
 };
 

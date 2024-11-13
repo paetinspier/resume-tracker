@@ -6,7 +6,6 @@ import {
   getDocs,
   updateDoc,
   deleteDoc,
-  where,
   getDoc,
 } from "firebase/firestore";
 import { firestore } from "./firebase";
@@ -89,14 +88,41 @@ export const updateJobApplication = async (
   applicationId: string,
   updatedFields: Partial<JobApplication>,
 ) => {
-  const applicationRef = doc(
-    firestore,
-    "users",
-    userId,
-    "applications",
-    applicationId,
-  );
-  await updateDoc(applicationRef, updatedFields);
+  try {
+    console.log("updating job app");
+    const applicationRef = doc(
+      firestore,
+      "users",
+      userId,
+      "applications",
+      applicationId,
+    );
+
+    await updateDoc(applicationRef, updatedFields);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const removeFieldFromJobApplication = async (
+  userId: string,
+  applicationId: string,
+  fields: any,
+) => {
+  try {
+    console.log("updating job app");
+    const applicationRef = doc(
+      firestore,
+      "users",
+      userId,
+      "applications",
+      applicationId,
+    );
+
+    await updateDoc(applicationRef, fields);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const deleteJobApplication = async (

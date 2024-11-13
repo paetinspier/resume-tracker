@@ -10,14 +10,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "./ui/input";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Label } from "./ui/label";
 import { Select } from "@radix-ui/react-select";
 import {
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
@@ -29,7 +27,7 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "./ui/calendar";
 import { FormMessage } from "./ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { JobApplication } from "@/lib/firebase/models";
+import { JobApplication, JobApplicationStatus } from "@/lib/firebase/models";
 import {
   addJobApplication,
   getJobApplications,
@@ -61,7 +59,6 @@ export default function AddApplicationDialog({
     watch,
     setError,
     reset,
-    control,
     formState: { errors },
   } = useForm<JobApplication>();
 
@@ -70,6 +67,7 @@ export default function AddApplicationDialog({
     try {
       if (date) {
         data.appliedDate = date;
+        data.status = JobApplicationStatus.APPLIED;
       } else {
         setError("appliedDate", { message: "required" });
         return;
@@ -162,152 +160,133 @@ export default function AddApplicationDialog({
           <div className="hidden md:block">Add Application</div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="h-full max-h-screen overflow-y-scroll">
+      <DialogContent className="h-full max-h-[90vh] overflow-y-scroll">
         <DialogHeader>
           <DialogTitle>Create Application</DialogTitle>
           <DialogDescription>
             Add create application description later
           </DialogDescription>
-          <div className="w-full pb-20 pt-6">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="companyName">Company Name</Label>
-                <Input
-                  id="companyName"
-                  {...register("companyName", { required: "required" })}
-                />
-                {errors.companyName ? (
-                  <FormMessage className="text-red-400">
-                    {errors.companyName.message}
-                  </FormMessage>
-                ) : null}
-              </div>
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="jobTitle">Job Title</Label>
-                <Input id="jobTitle" {...register("jobTitle")} />
-              </div>
-
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="jobDescription">Job Description</Label>
-                <Textarea id="jobDescription" {...register("jobDescription")} />
-              </div>
-
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="status">Status</Label>
-                <Controller
-                  control={control}
-                  name="status"
-                  render={({ field }) => {
-                    return (
-                      <Select onValueChange={field.onChange} {...field}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Application stauts" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Status</SelectLabel>
-                            <SelectItem value="applied">Applied</SelectItem>
-                            <SelectItem value="interviewing">
-                              Interviewing
-                            </SelectItem>
-                            <SelectItem value="rejected">Rejected</SelectItem>
-                            <SelectItem value="offered">Offered</SelectItem>
-                            <SelectItem value="accepted">Accepted</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    );
-                  }}
-                ></Controller>
-              </div>
-
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="status">Date Applied</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
-                    <Select onValueChange={handleDateBySelect}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent position="popper">
-                        <SelectItem value="0">Today</SelectItem>
-                        <SelectItem value="-1">Yesterday</SelectItem>
-                        <SelectItem value="-2">Two days ago</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <div className="rounded-md border">
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={(e) => handleDateByCalendar(e)}
-                      />
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="status">Upload Resume</Label>
-                <Input
-                  type="file"
-                  key={resumeInputKey}
-                  onChange={handleResumeUpload}
-                />
-                {watch("resumeURL") && (
-                  <Button variant={"destructive"} onClick={handleResumeReset}>
-                    Remove
-                  </Button>
-                )}
-                {errors.resumeURL ? (
-                  <FormMessage className="text-red-400">
-                    {errors.resumeURL.message}
-                  </FormMessage>
-                ) : null}
-              </div>
-
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="status">Upload Cover Letter</Label>
-                <Input
-                  type="file"
-                  key={coverLetterInputKey}
-                  onChange={handleCoverLetterUpload}
-                />
-                {watch("coverLetterURL") && (
-                  <Button
-                    variant={"destructive"}
-                    onClick={handleCoverLetterReset}
-                  >
-                    Remove
-                  </Button>
-                )}
-                {errors.coverLetterURL ? (
-                  <FormMessage className="text-red-400">
-                    {errors.coverLetterURL.message}
-                  </FormMessage>
-                ) : null}
-              </div>
-
-              <div>
-                <Button type="submit" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {loading ? "Creating..." : "Create"}
-                </Button>
-              </div>
-            </form>
-          </div>
         </DialogHeader>
+        <div className="w-full pb-6 pt-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="companyName">Company Name</Label>
+              <Input
+                id="companyName"
+                {...register("companyName", { required: "required" })}
+              />
+              {errors.companyName ? (
+                <FormMessage className="text-red-400">
+                  {errors.companyName.message}
+                </FormMessage>
+              ) : null}
+            </div>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="jobTitle">Job Title</Label>
+              <Input id="jobTitle" {...register("jobTitle")} />
+            </div>
+
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="jobDescription">Job Source Url</Label>
+              <Input id="jobDescription" {...register("applicationSurceUrl")} />
+            </div>
+
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="jobDescription">Job Description</Label>
+              <Textarea id="jobDescription" {...register("jobDescription")} />
+            </div>
+
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="status">Date Applied</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !date && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
+                  <Select onValueChange={handleDateBySelect}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      <SelectItem value="0">Today</SelectItem>
+                      <SelectItem value="-1">Yesterday</SelectItem>
+                      <SelectItem value="-2">Two days ago</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="rounded-md border">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={(e) => handleDateByCalendar(e)}
+                    />
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="status">Upload Resume</Label>
+              <Input
+                type="file"
+                key={resumeInputKey}
+                onChange={handleResumeUpload}
+              />
+              {watch("resumeURL") && (
+                <Button variant={"destructive"} onClick={handleResumeReset}>
+                  Remove
+                </Button>
+              )}
+              {errors.resumeURL ? (
+                <FormMessage className="text-red-400">
+                  {errors.resumeURL.message}
+                </FormMessage>
+              ) : null}
+            </div>
+
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="status">Upload Cover Letter</Label>
+              <Input
+                type="file"
+                key={coverLetterInputKey}
+                onChange={handleCoverLetterUpload}
+              />
+              {watch("coverLetterURL") && (
+                <Button
+                  variant={"destructive"}
+                  onClick={handleCoverLetterReset}
+                >
+                  Remove
+                </Button>
+              )}
+              {errors.coverLetterURL ? (
+                <FormMessage className="text-red-400">
+                  {errors.coverLetterURL.message}
+                </FormMessage>
+              ) : null}
+            </div>
+
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="jobDescription">Notes</Label>
+              <Textarea id="jobDescription" {...register("notes")} />
+            </div>
+
+            <div>
+              <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading ? "Creating..." : "Create"}
+              </Button>
+            </div>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

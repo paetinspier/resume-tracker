@@ -47,8 +47,11 @@ interface ClientHomePageProps {
 export default function ClientHomePage({
   initialApplications,
 }: ClientHomePageProps) {
-  const [applications, setApplications] =
-    React.useState<JobApplication[]>(initialApplications);
+  const [applications, setApplications] = React.useState<JobApplication[]>(
+    initialApplications.sort(
+      (a, b) => b.appliedDate.getTime() - a.appliedDate.getTime(),
+    ),
+  );
   const { user } = useAuth();
   const router = useRouter();
 
@@ -73,7 +76,9 @@ export default function ClientHomePage({
           return a;
         }
       });
-      setApplications(apps);
+      setApplications(
+        apps.sort((a, b) => b.appliedDate.getTime() - a.appliedDate.getTime()),
+      );
       toast({
         title: "Update Job Application Status",
         description: `${app.status} -> ${updatedApp.status}`,
@@ -113,7 +118,7 @@ export default function ClientHomePage({
         </div>
         <Separator />
 
-        <ScrollArea className="h-full max-h-[80vh] w-full rounded-md border">
+        <ScrollArea className="h-full max-h-[80vh] w-full rounded-md border p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full max-h-full overflow-y-scroll gap-4">
             {!applications && (
               <div className="w-full h-full">No applications current</div>

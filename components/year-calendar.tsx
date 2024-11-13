@@ -102,7 +102,7 @@ export default function YearCalendar({
                           ja.appliedDate.toDateString() === day.toDateString(),
                       );
                       return (
-                        <HoverCard>
+                        <HoverCard key={day.toDateString()}>
                           <HoverCardTrigger asChild>
                             <div
                               onClick={() => console.log(day)}
@@ -148,6 +148,7 @@ export default function YearCalendar({
                               {jobApps.map((a) => {
                                 return (
                                   <Button
+                                    key={a.id}
                                     onClick={() =>
                                       router.push(
                                         `/portal/applications/${a.id}`,

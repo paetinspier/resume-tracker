@@ -8,8 +8,10 @@ export interface JobApplication {
   resumeURL: string;
   coverLetterURL: string;
   appliedDate: Date;
-  interviewDates?: Date[];
+  interviewStartDate?: Date;
+  interviewEndDate?: Date;
   rejectionDate?: Date;
+  offerDate?: Date;
   applicationSurceUrl?: string;
   status: string;
   notes: string;
@@ -24,8 +26,11 @@ export interface FirestoreJobApplicationResponse {
   coverLetterURL: string;
   appliedDate: Timestamp;
   interviewStartDate?: Timestamp;
+  interviewEndDate?: Timestamp;
   rejectionDate?: Timestamp;
+  offerDate?: Timestamp;
   status: string;
+  notes?: string;
 }
 
 export function convertFirestoreJobApplicationResponse(
@@ -42,11 +47,23 @@ export function convertFirestoreJobApplicationResponse(
     rejectionDate: response.rejectionDate
       ? new Date(response.rejectionDate.seconds * 1000)
       : undefined,
-    interviewStartDate: response.interviewStartDate
-      ? new Date(response.interviewStartDate.seconds * 1000)
+    offerDate: response.offerDate
+      ? new Date(response.offerDate.seconds * 1000)
       : undefined,
     status: response.status,
+    notes: "",
   };
+  if (response.interviewStartDate) {
+    jobApp.interviewStartDate = new Date(
+      response.interviewStartDate.seconds * 1000,
+    );
+  }
+  if (response.interviewEndDate) {
+    jobApp.interviewEndDate = new Date(
+      response.interviewEndDate.seconds * 1000,
+    );
+  }
+
   return jobApp;
 }
 

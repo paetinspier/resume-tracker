@@ -57,7 +57,7 @@ export default function ResumePage() {
           return (
             <Card key={index} className="w-full flex justify-start items-start">
               <CardHeader className="w-full">
-                <div className="w-full flex flex-row justify-start items-center">
+                <div className="w-full flex flex-row justify-start items-center flex-wrap">
                   <CardTitle>{resume.name}</CardTitle>
                 </div>
                 <div className="w-full flex flex-row justify-start items-center gap-2 overflow-hidden">

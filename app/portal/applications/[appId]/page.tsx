@@ -140,10 +140,14 @@ export default function ApplicationPage() {
 
       if (data.notes) {
         jobAppPartial.notes = data.notes;
+      } else {
+        jobAppPartial.notes = "";
       }
 
       if (data.applicationSurceUrl) {
         jobAppPartial.applicationSurceUrl = data.applicationSurceUrl;
+      } else {
+        jobAppPartial.applicationSurceUrl = "";
       }
 
       // handle interview dates updates

@@ -414,7 +414,7 @@ export default function ApplicationPage() {
                   key={resumeInputKey}
                   onChange={handleResumeUpload}
                 />
-                {watch("resumeURL") && resume && (
+                {resume && (
                   <Button variant={"destructive"} onClick={handleResumeReset}>
                     Remove
                   </Button>
@@ -436,7 +436,7 @@ export default function ApplicationPage() {
                   key={coverLetterInputKey}
                   onChange={handleCoverLetterUpload}
                 />
-                {watch("coverLetterURL") && coverLetter && (
+                {coverLetter && (
                   <Button
                     variant={"destructive"}
                     onClick={handleCoverLetterReset}

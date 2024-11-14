@@ -225,6 +225,8 @@ export default function ApplicationPage() {
       setValue("status", data.status);
       console.log("changes -> ", jobAppPartial);
       await updateJobApplication(user?.uid, data.id, jobAppPartial);
+      handleResumeReset();
+      handleCoverLetterReset();
 
       toast({
         title: "Changes Saved",

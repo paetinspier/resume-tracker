@@ -5,8 +5,10 @@ export interface JobApplication {
   companyName: string;
   jobTitle: string;
   jobDescription: string;
-  resumeURL: string;
-  coverLetterURL: string;
+  resumeURL?: string;
+  resumeName?: string;
+  coverLetterURL?: string;
+  coverLetterName?: string;
   appliedDate: Date;
   interviewStartDate?: Date;
   interviewEndDate?: Date;
@@ -23,7 +25,9 @@ export interface FirestoreJobApplicationResponse {
   jobTitle: string;
   jobDescription: string;
   resumeURL: string;
+  resumeName?: string;
   coverLetterURL: string;
+  coverLetterName: string;
   appliedDate: Timestamp;
   interviewStartDate?: Timestamp;
   interviewEndDate?: Timestamp;
@@ -42,7 +46,9 @@ export function convertFirestoreJobApplicationResponse(
     jobTitle: response.jobTitle,
     jobDescription: response.jobDescription,
     resumeURL: response.resumeURL,
+    resumeName: response.resumeName,
     coverLetterURL: response.coverLetterURL,
+    coverLetterName: response.coverLetterName,
     appliedDate: new Date(response.appliedDate.seconds * 1000),
     rejectionDate: response.rejectionDate
       ? new Date(response.rejectionDate.seconds * 1000)

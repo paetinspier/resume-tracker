@@ -3,7 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardDescription, CardHeader } from "@/components/ui/card";
+import { FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/AuthContext";
@@ -13,6 +15,7 @@ import {
   updateJobApplication,
 } from "@/lib/firebase/firestore";
 import { JobApplication, JobApplicationStatus } from "@/lib/firebase/models";
+import { uploadFile } from "@/lib/firebase/storage";
 import { deleteField } from "firebase/firestore";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -34,8 +37,15 @@ export default function ApplicationPage() {
     rejectionDate: null,
     offerDate: null,
   });
+  const [resumeInputKey, setResumeInputKey] = React.useState<number>(0);
+  const [resume, setResume] = useState<File>();
+  const [coverLetterInputKey, setCoverLetterInputKey] =
+    React.useState<number>(0);
+  const [coverLetter, setCoverLetter] = useState<File>();
 
   useEffect(() => {
+    let isMounted = true; // Prevent re-runs due to Strict Mode double invocation
+
     async function fetchApp() {
       console.log("fetching application");
       try {
@@ -43,8 +53,8 @@ export default function ApplicationPage() {
           return;
         }
         const res = await getJobApplicationById(user.uid, params.appId);
-        if (!res) {
-        } else {
+        if (res && isMounted) {
+          // Check isMounted to avoid unwanted re-renders
           console.log("res", res);
           setValue("companyName", res.companyName);
           setValue("jobTitle", res.jobTitle);
@@ -53,19 +63,17 @@ export default function ApplicationPage() {
           setValue("appliedDate", res.appliedDate);
           setValue("interviewStartDate", res.interviewStartDate);
           setValue("interviewEndDate", res.interviewEndDate);
-          setValue("offerDate", res.interviewEndDate);
+          setValue("offerDate", res.offerDate);
           setValue("status", res.status);
           setValue("resumeURL", res.resumeURL);
+          setValue("resumeName", res.resumeName);
           setValue("notes", res.notes);
-          setValue("coverLetterURL", res.companyName);
+          setValue("coverLetterURL", res.coverLetterURL);
+          setValue("coverLetterName", res.coverLetterName);
           setValue("id", res.id);
           setValue("applicationSurceUrl", res.applicationSurceUrl);
-          const initializeDates: {
-            appliedDate: Date | null;
-            interviewDates: DateRange | null;
-            rejectionDate: Date | null;
-            offerDate: Date | null;
-          } = {
+
+          const initializeDates = {
             appliedDate: res.appliedDate || null,
             interviewDates: res.interviewStartDate
               ? {
@@ -83,10 +91,14 @@ export default function ApplicationPage() {
       }
     }
 
-    if (user && user.uid && params.appId) {
+    if (user?.uid && params.appId) {
       fetchApp();
     }
-  }, [params, user]);
+
+    return () => {
+      isMounted = false; // Clean-up function to avoid setting state if component unmounts
+    };
+  }, [user?.uid, params.appId]); // Limit dependencies to only `user.uid` and `params.appId`
 
   const {
     handleSubmit,
@@ -94,7 +106,7 @@ export default function ApplicationPage() {
     watch,
     setValue,
     setError,
-    formState: {},
+    formState: { errors },
   } = useForm<JobApplication>();
 
   const onSubmit = async (data: JobApplication) => {
@@ -173,6 +185,30 @@ export default function ApplicationPage() {
         }
       }
 
+      if (resume) {
+        const savedResume = await uploadFile(user.uid, resume, "resumes");
+        data.resumeURL = savedResume.downloadUrl || "";
+        data.resumeName = savedResume.name || undefined;
+        jobAppPartial.resumeURL = savedResume.downloadUrl || undefined;
+        jobAppPartial.resumeName = savedResume.name || undefined;
+        setValue("resumeName", savedResume.name || undefined);
+        setValue("resumeURL", savedResume?.downloadUrl || undefined);
+      }
+
+      if (coverLetter) {
+        const savedCoverLetter = await uploadFile(
+          user.uid,
+          coverLetter,
+          "cover-letters",
+        );
+        data.coverLetterURL = savedCoverLetter.downloadUrl || "";
+        data.coverLetterName = savedCoverLetter.name || undefined;
+        jobAppPartial.coverLetterName = savedCoverLetter.name || undefined;
+        jobAppPartial.coverLetterURL =
+          savedCoverLetter.downloadUrl || undefined;
+        setValue("coverLetterName", savedCoverLetter.name || undefined);
+      }
+
       jobAppPartial.status = data.status;
       setValue("status", data.status);
 
@@ -188,6 +224,38 @@ export default function ApplicationPage() {
       console.log(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e?.target?.files && e?.target?.files.length > 0) {
+      setResume(e.target.files[0]);
+    } else {
+      setError("resumeURL", { message: "Failed to upload resume" });
+    }
+  };
+
+  const handleResumeReset = () => {
+    if (resume) {
+      setResume(undefined);
+      setResumeInputKey((prev) => prev + 1);
+    }
+  };
+
+  const handleCoverLetterUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e?.target?.files.length > 0) {
+      setCoverLetter(e.target.files[0]);
+    } else {
+      setError("coverLetterURL", {
+        message: "Failed to upload cover letter",
+      });
+    }
+  };
+
+  const handleCoverLetterReset = () => {
+    if (coverLetter) {
+      setCoverLetter(undefined);
+      setCoverLetterInputKey((prev) => prev + 1);
     }
   };
 
@@ -322,6 +390,53 @@ export default function ApplicationPage() {
                     />
                   </div>
                 </div>
+              </div>
+
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="status">Upload Resume</Label>
+                {watch("resumeName") && (
+                  <Label>current: {watch("resumeName")}</Label>
+                )}
+                <Input
+                  type="file"
+                  key={resumeInputKey}
+                  onChange={handleResumeUpload}
+                />
+                {watch("resumeURL") && resume && (
+                  <Button variant={"destructive"} onClick={handleResumeReset}>
+                    Remove
+                  </Button>
+                )}
+                {errors.resumeURL ? (
+                  <FormMessage className="text-red-400">
+                    {errors.resumeURL.message}
+                  </FormMessage>
+                ) : null}
+              </div>
+
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="status">Upload Cover Letter</Label>
+                {watch("coverLetterName") && (
+                  <Label>current: {watch("coverLetterName")}</Label>
+                )}
+                <Input
+                  type="file"
+                  key={coverLetterInputKey}
+                  onChange={handleCoverLetterUpload}
+                />
+                {watch("coverLetterURL") && coverLetter && (
+                  <Button
+                    variant={"destructive"}
+                    onClick={handleCoverLetterReset}
+                  >
+                    Remove
+                  </Button>
+                )}
+                {errors.coverLetterURL ? (
+                  <FormMessage className="text-red-400">
+                    {errors.coverLetterURL.message}
+                  </FormMessage>
+                ) : null}
               </div>
               <div className="flex flex-col justify-start items-start gap-4">
                 <CardDescription>Notes</CardDescription>

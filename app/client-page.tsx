@@ -290,11 +290,13 @@ export default function ClientHomePage({
                           </CardDescription>
                           <Button
                             variant={"ghost"}
-                            onClick={() =>
-                              router.push(
-                                `/portal/resumes/view/${encodeURIComponent(app.resumeURL)}`,
-                              )
-                            }
+                            onClick={() => {
+                              if (app.resumeURL) {
+                                router.push(
+                                  `/portal/resumes/view/${encodeURIComponent(app.resumeURL)}`,
+                                );
+                              }
+                            }}
                             disabled={!app.resumeURL}
                           >
                             {app.resumeURL ? "View Resume" : " - "}
@@ -307,11 +309,13 @@ export default function ClientHomePage({
                           <Button
                             variant={"ghost"}
                             disabled={!app.coverLetterURL}
-                            onClick={() =>
-                              router.push(
-                                `/portal/coverletters/view/${encodeURIComponent(app.coverLetterURL)}`,
-                              )
-                            }
+                            onClick={() => {
+                              if (app.coverLetterURL) {
+                                router.push(
+                                  `/portal/coverletters/view/${encodeURIComponent(app.coverLetterURL)}`,
+                                );
+                              }
+                            }}
                           >
                             {app.coverLetterURL ? "View Cover Letter" : " - "}
                           </Button>

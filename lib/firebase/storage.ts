@@ -1,12 +1,29 @@
 import { storage } from "./firebase";
-import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  listAll,
+  getMetadata,
+} from "firebase/storage";
 
-export async function uploadFile(userId: string, file: File, folder: string) {
-  // Upload file to Firebase Storage if it's a unique document
-  const fileRef = ref(storage, `users/${userId}/${folder}/${file.name}`);
-  await uploadBytes(fileRef, file);
+export async function uploadFile(
+  userId: string,
+  file: File,
+  folder: string,
+): Promise<{ downloadUrl: string | null; name: string | null }> {
+  try {
+    // Upload file to Firebase Storage if it's a unique document
+    const fileRef = ref(storage, `users/${userId}/${folder}/${file.name}`);
+    await uploadBytes(fileRef, file);
 
-  return await getDownloadURL(fileRef);
+    const downloadUrl = await getDownloadURL(fileRef);
+    const metaData = await getMetadata(fileRef);
+    return { downloadUrl: downloadUrl, name: metaData.name };
+  } catch (err) {
+    console.log(err);
+    return { downloadUrl: null, name: null };
+  }
 }
 
 export const getResumes = async (userId: string) => {

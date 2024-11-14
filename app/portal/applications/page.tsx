@@ -7,12 +7,14 @@ import Loading from "@/app/loading";
 import ClientHomePage from "@/app/client-page";
 
 export default function Home() {
-  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [applications, setApplications] = useState<JobApplication[]>();
   const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
     const fetchApplications = async () => {
+      setFetching(true);
       try {
         if (user) {
           const applicationsData = await getJobApplications(user.uid);
@@ -29,10 +31,11 @@ export default function Home() {
         console.error("Error fetching job applications:", error);
       } finally {
         setLoading(false);
+        setFetching(false);
       }
     };
 
-    if (user) {
+    if (user && !fetching && !applications) {
       console.log("fetching applications");
       fetchApplications();
     }
@@ -40,5 +43,5 @@ export default function Home() {
 
   if (loading) return <Loading></Loading>;
 
-  return <ClientHomePage initialApplications={applications} />;
+  return <ClientHomePage initialApplications={applications || []} />;
 }

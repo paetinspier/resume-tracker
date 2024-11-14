@@ -79,7 +79,8 @@ export default function AddApplicationDialog({
       // save resume and cover letter documents
       if (resume) {
         const savedResume = await uploadFile(user.uid, resume, "resumes");
-        data.resumeURL = savedResume || "";
+        data.resumeURL = savedResume.downloadUrl || "";
+        data.resumeName = savedResume.name || undefined;
       }
 
       if (coverLetter) {
@@ -88,7 +89,8 @@ export default function AddApplicationDialog({
           coverLetter,
           "cover-letters",
         );
-        data.coverLetterURL = savedCoverLetter || "";
+        data.coverLetterURL = savedCoverLetter.downloadUrl || "";
+        data.coverLetterName = savedCoverLetter.name || undefined;
       }
 
       console.log("data", data);

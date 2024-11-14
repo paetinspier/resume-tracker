@@ -16,7 +16,7 @@ export interface JobApplication {
   offerDate?: Date;
   applicationSurceUrl?: string;
   status: string;
-  notes: string;
+  notes?: string;
 }
 
 export interface FirestoreJobApplicationResponse {
@@ -33,6 +33,7 @@ export interface FirestoreJobApplicationResponse {
   interviewEndDate?: Timestamp;
   rejectionDate?: Timestamp;
   offerDate?: Timestamp;
+  applicationSurceUrl?: string;
   status: string;
   notes?: string;
 }
@@ -57,7 +58,8 @@ export function convertFirestoreJobApplicationResponse(
       ? new Date(response.offerDate.seconds * 1000)
       : undefined,
     status: response.status,
-    notes: "",
+    notes: response.notes,
+    applicationSurceUrl: response.applicationSurceUrl,
   };
   if (response.interviewStartDate) {
     jobApp.interviewStartDate = new Date(

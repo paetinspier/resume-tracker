@@ -90,7 +90,7 @@ export const updateJobApplication = async (
   updatedFields: Partial<JobApplication>,
 ) => {
   try {
-    console.log("updating job app");
+    console.log("updating job app", updatedFields);
     const applicationRef = doc(
       firestore,
       "users",

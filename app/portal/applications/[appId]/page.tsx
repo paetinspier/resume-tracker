@@ -72,6 +72,7 @@ export default function ApplicationPage() {
           setValue("coverLetterName", res.coverLetterName);
           setValue("id", res.id);
           setValue("applicationSurceUrl", res.applicationSurceUrl);
+          setValue("applicationSurceUrl", res.applicationSurceUrl);
 
           const initializeDates = {
             appliedDate: res.appliedDate || null,
@@ -135,8 +136,15 @@ export default function ApplicationPage() {
         coverLetterURL: data.coverLetterURL,
         appliedDate: data.appliedDate,
         status: data.status,
-        notes: data.notes,
       };
+
+      if (data.notes) {
+        jobAppPartial.notes = data.notes;
+      }
+
+      if (data.applicationSurceUrl) {
+        jobAppPartial.applicationSurceUrl = data.applicationSurceUrl;
+      }
 
       // handle interview dates updates
       if (data.interviewStartDate || dates.interviewDates) {
@@ -211,7 +219,7 @@ export default function ApplicationPage() {
 
       jobAppPartial.status = data.status;
       setValue("status", data.status);
-
+      console.log("changes -> ", jobAppPartial);
       await updateJobApplication(user?.uid, data.id, jobAppPartial);
 
       toast({

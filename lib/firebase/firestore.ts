@@ -7,6 +7,7 @@ import {
   updateDoc,
   deleteDoc,
   getDoc,
+  FieldValue,
 } from "firebase/firestore";
 import { firestore } from "./firebase";
 import {
@@ -107,7 +108,7 @@ export const updateJobApplication = async (
 export const removeFieldFromJobApplication = async (
   userId: string,
   applicationId: string,
-  fields: any,
+  fields: { [key: string]: FieldValue },
 ) => {
   try {
     console.log("updating job app");

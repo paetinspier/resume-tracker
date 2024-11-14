@@ -21,7 +21,6 @@ import { useForm } from "react-hook-form";
 
 export default function ApplicationPage() {
   const params = useParams<{ appId: string }>();
-  const [application, setApplication] = useState<JobApplication>();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [dates, setDates] = useState<{
@@ -41,15 +40,12 @@ export default function ApplicationPage() {
       console.log("fetching application");
       try {
         if (!user) {
-          setApplication(undefined);
           return;
         }
         const res = await getJobApplicationById(user.uid, params.appId);
         if (!res) {
-          setApplication(undefined);
         } else {
           console.log("res", res);
-          setApplication(res);
           setValue("companyName", res.companyName);
           setValue("jobTitle", res.jobTitle);
           setValue("jobDescription", res.jobDescription);
@@ -84,7 +80,6 @@ export default function ApplicationPage() {
         }
       } catch (err) {
         console.log(err);
-        setApplication(undefined);
       }
     }
 

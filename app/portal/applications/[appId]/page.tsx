@@ -133,7 +133,6 @@ export default function ApplicationPage() {
         jobTitle: data.jobTitle,
         jobDescription: data.jobDescription,
         resumeURL: data.resumeURL,
-        coverLetterURL: data.coverLetterURL,
         appliedDate: data.appliedDate,
         status: data.status,
       };
@@ -223,15 +222,12 @@ export default function ApplicationPage() {
 
       jobAppPartial.status = data.status;
       setValue("status", data.status);
-      console.log("changes -> ", jobAppPartial);
       await updateJobApplication(user?.uid, data.id, jobAppPartial);
       handleResumeReset();
       handleCoverLetterReset();
 
       toast({
         title: "Changes Saved",
-        description: "description",
-        action: <Button>close</Button>,
       });
     } catch (err) {
       console.log("error with application/create method in dialog component");
